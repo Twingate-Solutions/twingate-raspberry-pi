@@ -30,7 +30,7 @@ app = Flask(__name__)
 ## create resources
 
 # stores tenant name and API token locally
-@app.route("/store/tenant", methods=['POST'])
+@app.route("/tenant", methods=['POST'])
 def store_tenant():
     error = None
     if request.method == 'POST':
@@ -49,11 +49,12 @@ def store_tenant():
             
             storage.StoreTenant(tenant)
             storage.StoreAuthToken(token,tenant)
-            return ""
+            return {"status":"ok"}
+        
     return errors.wrong_call_type()
 
 # Check if current API Token + Tenant has the required READ, WRITE and PROVISION scope
-@app.route("/tgapi/validate", methods=['GET'])
+@app.route("/token", methods=['GET'])
 def validate_tgapi():
     error = None
     if request.method == 'GET':
@@ -78,17 +79,18 @@ def validate_tgapi():
     return errors.wrong_call_type()
 
 # create a Home Network remote network, returns the ID and Name of the RN created
-@app.route("/creatern", methods=['GET'])
+@app.route("/homeremotenetwork", methods=['POST'])
 def get_networks():
     error = None
-    if request.method == 'GET':
+    if request.method == 'POST':
             HasError,resp = rn.create_home_rn()
             if HasError:
                 return errors.rn_creation()
             return resp
     else:
         return errors.wrong_call_type()
-    
+
+# Not used
 @app.route("/connectors", methods=['GET'])
 def get_connectors():
     error = None
@@ -99,7 +101,7 @@ def get_connectors():
     else:
         return errors.wrong_call_type()
 
-@app.route("/createconnector", methods=['POST'])
+@app.route("/connector", methods=['POST'])
 def create_connector():
     error = None
     if request.method == 'POST':
@@ -125,7 +127,7 @@ def create_connector():
             return resp
     else:
         return errors.wrong_call_type()
-    
+
 @app.route("/subnet", methods=['GET'])
 def get_subnet():
     error = None
@@ -136,7 +138,7 @@ def get_subnet():
     else:
         return errors.wrong_call_type()
 
-@app.route("/resource/create", methods=['POST'])
+@app.route("/homesubnetresource", methods=['POST'])
 def create_subnet_resource():
     error = None
     if request.method == 'POST':
