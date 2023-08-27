@@ -153,7 +153,6 @@ def create_subnet_resource():
     if request.method == 'POST':
             hasError,msg = resources.create_resource_in_homenetwork(rn_id,address)
             if hasError:
-                # should we delete the home remote network here?
                 return errors.tg_res_creation_error(msg)
             else:
                  return msg
