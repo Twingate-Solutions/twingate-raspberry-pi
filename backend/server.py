@@ -14,6 +14,7 @@ import storage
 import errors
 import network
 import connectors
+import resources
 import rn
 
 app = Flask(__name__)
@@ -134,4 +135,28 @@ def get_subnet():
             return {"subnet":str(subnet)}
     else:
         return errors.wrong_call_type()
-    
+
+@app.route("/resource/create", methods=['POST'])
+def create_subnet_resource():
+    error = None
+    if request.method == 'POST':
+            content_type = request.headers.get('Content-Type')
+            if (content_type == 'application/json'):
+                json = request.json
+                if not json['address']:
+                    return errors.tg_res_address_error()
+                address = json['address']
+                if not json['remoteNetworkId']:
+                    return errors.tg_res_address_error()
+                rn_id = json['remoteNetworkId']
+
+    if request.method == 'POST':
+            hasError,msg = resources.create_resource_in_homenetwork(rn_id,address)
+            if hasError:
+                # should we delete the home remote network here?
+                return errors.tg_res_creation_error(msg)
+            else:
+                 return msg
+    else:
+        return errors.wrong_call_type()
+        

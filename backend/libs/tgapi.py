@@ -49,6 +49,7 @@ def generic_api_call_handler(get_res_func,res_data):
             logging.debug("Converting Response to JSON Object.")
             json_object = json.loads(response.text)
             return json_object
+    
         
 def check_api_error(payload):
     if 'errors' in payload.keys():

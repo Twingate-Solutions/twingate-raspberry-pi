@@ -33,6 +33,12 @@ def token_creation():
 def tg_api_error():
     return {"errors":[{"message":"Twingate API error."}]};
 
+def tg_res_address_error():
+    return {"errors":[{"message":"address missing."}]};
+
+def tg_res_creation_error(msg):
+    return {"errors":[{"message":"could not create Resource: "+msg}]};
+
 def connector_install_error(rcode):
     return {"errors":[{"message":"Error installing Connector.","return_code":str(rcode)}]};
 
