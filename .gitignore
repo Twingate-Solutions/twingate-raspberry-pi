@@ -1,3 +1,7 @@
+# other
+backend/store/
+backend/resources/install_connector.sh
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
