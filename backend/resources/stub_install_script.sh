@@ -1,0 +1,1 @@
+curl "https://binaries.twingate.com/connector/setup.sh" | sudo TWINGATE_ACCESS_TOKEN="<ACCESSTOKEN>" TWINGATE_REFRESH_TOKEN="<REFRESHTOKEN>" TWINGATE_LOG_ANALYTICS="v2" TWINGATE_NETWORK="<TENANT>" bash
