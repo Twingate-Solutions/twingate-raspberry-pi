@@ -1,10 +1,12 @@
 import logging
 
+def success():
+    return {"status":"OK","errors":[]}
 def wrong_token_format():
     return {"errors":[{"message":"Wrong token format"}]};
 
-def wrong_call_type():
-    return {"errors":[{"message":"Wrong call type"}]};
+def wrong_call_type(msg):
+    return {"errors":[{"message":"Wrong call type: "+msg}]};
 
 def token_or_tenant_missing(what_is_missing):
     return {"errors":[{"message":what_is_missing+" is missing."}]};
@@ -15,8 +17,8 @@ def rn_id_missing():
 def token_wrong_scope(current_scope):
     return {"errors":[{"message":"API token requires Read, Write and Provision permissions. Your current API Token seems to be "+str(current_scope)}]};
 
-def rn_creation():
-    return {"errors":[{"message":"cannot create home remote network."}]};
+def rn_creation(resp):
+    return {"errors":[{"message":"cannot create home remote network: "+str(resp)}]};
 
 def connector_creation(message):
     return {"errors":[{"message":"cannot create connector in home remote network: "+message}]};
@@ -27,8 +29,8 @@ def connector_list():
 def connector_exists():
     return {"errors":[{"message":"connector for home network already exists."}]};
 
-def token_creation():
-    return {"errors":[{"message":"cannot create tokens for connector in home remote network."}]};
+def token_creation(mes):
+    return {"errors":[{"message":"cannot create tokens for connector in home remote network: "+str(mes)}]};
 
 def tg_api_error():
     return {"errors":[{"message":"Twingate API error."}]};

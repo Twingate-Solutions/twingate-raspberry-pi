@@ -175,10 +175,10 @@ def create_home_connector(id):
     else:
         HasError,all_connectors = get_connector_list(id)
         if HasError:
-            return True,""
+            return True,all_connectors
         else:
             NewConnName = get_new_connector_name(all_connectors)
-            print(NewConnName)
+            #print(NewConnName)
             return create_connector(NewConnName,id)
 
 def generate_tokens(id):
@@ -210,7 +210,7 @@ def provision_install_script(accessToken,refreshToken,tenant):
 def uninstall_connector():
     try:
         output = check_output(["sudo","apt","remove","twingate-connector"], text=True)
-        print(output)
+        #print(output)
         return {"status":"OK"}
     except subprocess.CalledProcessError as e:
         return errors.connector_uninstall_error(e.returncode)
@@ -218,14 +218,14 @@ def uninstall_connector():
 def run_install_script(filepath):
     try:
         output = check_output(["sudo","sh",filepath], text=True)
-        print(output)
-        return {"status":"OK"}
+        #print(output)
+        return False,output
     except subprocess.CalledProcessError as e:
-        return errors.connector_install_error(e.returncode)
+        return True,errors.connector_install_error(e.returncode)
 
 def delete_install_script(filepath):
     return True
 
 def install_connector():
-    res = run_install_script(INSTALL_INSTANCE)
-    return res
+    hasError,res = run_install_script(INSTALL_INSTANCE)
+    return hasError,res
