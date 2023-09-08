@@ -1,0 +1,44 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+</head>
+{% from 'bootstrap5/form.html' import render_form %}
+
+{% block title %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<!--
+	TIPS about using Bootstrap-Flask:
+	https://github.com/helloflask/bootstrap-flask
+	https://bootstrap-flask.readthedocs.io/
+-->
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
+
+      <h1 class="pt-5 pb-2">Success!</h1>
+      <h2 class="pt-5 pb-2">Here is what we have set up for you..</h2>
+      <ol>
+        <li>A Remote Network called <b>"Home Network".</b></li>
+        <li>A <b>Connector</b> running on your Twingate Raspberry Pi</li>
+        <li>A <b>Resource</b> allowing access to your network's primary subdomain</li>
+      </ol>
+
+      <h2 class="pt-5 pb-2">..And here is what you should do next!</h2>
+      <ol>
+        <li>Head over to <a href="https://get.twingate.com">get.twingate.com</a> to download the <b>Twingate Client on your device</b>.</li>
+        <li><b>Sign in to the Twingate Client</b> and test remote connectivity.</li>
+        <li>(If applicable) <b>Close any open port or port forward</b> you have set up on your router prior to deploying Twingate.</li>
+        <li>Follow our <b><a href="https://www.twingate.com/docs/homelab-step-by-step">public guide</a></b> to further protect your home network.</li>
+      </ol>
+      <p class="lead"></p>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

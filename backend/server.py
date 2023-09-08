@@ -1,12 +1,21 @@
 # requires flask
 # requires nmap (system) and python-namp
-
+# requires wtforms
+# Flask-WTF
+# pip install bootstrap-flask
 # pip install python-nmap (as sudo for OS fingerprinting)
 # run with sudo flask --app server run -h 127.0.0.1 -p 10064 (sudo required because installing a Connector requires it)
 
-from flask import Flask
-from flask import request
-import sys
+from flask import Flask, request, render_template, url_for, flash, redirect
+from wtforms import Form, TextAreaField, validators, StringField, SubmitField
+from flask import Flask, render_template, redirect, url_for
+from flask_bootstrap import Bootstrap5
+
+from flask_wtf import FlaskForm, CSRFProtect
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, Length, ValidationError
+
+import sys,re
 
 # internal library imports
 sys.path.insert(1, './libs')
@@ -18,6 +27,118 @@ import resources
 import rn
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '7d441f27d441f27567d233f2b6176a'
+bootstrap = Bootstrap5(app)
+csrf = CSRFProtect(app)
+
+ADMINCONSOLEREGEX = "https:[\/]{2}(.+)\.twingate\.com.*"
+
+class TGInfoForm(FlaskForm):
+
+    adminconsole_url = StringField('Admin Console URL (for example: https:///<yourtenantname>.twingate.com/)', validators=[DataRequired()])
+    apitoken = StringField('Twingate API Token with Read, Write & Provision permissions:', validators=[DataRequired(), Length(134, 134)])
+    adminconsole_url = StringField('Admin Console URL (for example: https:///<yourtenantname>.twingate.com/)', validators=[])
+    apitoken = StringField('Twingate API Token with Read, Write & Provision permissions:', validators=[])
+    submit = SubmitField('Submit')
+
+    def validate_adminconsole_url(form, adminconsole_url):
+        result = re.match(ADMINCONSOLEREGEX, adminconsole_url.data)
+        if not result:
+            raise ValidationError('Admin Console URL provided does not seem to be in the right format: https://<yourtenantname>.twingate.com/')
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    form = TGInfoForm()
+    message = ""
+    if form.validate_on_submit():
+
+        adminurl = form.adminconsole_url.data
+        token = form.apitoken.data
+        tenant = re.match(ADMINCONSOLEREGEX, adminurl).group(1)
+        print("Form validated:"+tenant)
+
+            
+        # storing info locally
+        if not storage.is_token_valid(token):
+                print(errors.wrong_token_format())
+                return render_template('error.html',message = errors.rwrong_token_format())
+                
+        else:
+             print("info stored locally.")
+            
+        storage.StoreTenant(tenant)
+        storage.StoreAuthToken(token,tenant)
+        # creates a temporary remote network
+        HasError,resRN = rn.create_rn("TODELETE","ON_PREMISE")
+        if HasError:
+             print(errors.token_wrong_scope("READ or READ,WRITE only"))
+             return render_template('error.html',message = errors.rtoken_wrong_scope("READ or READ,WRITE only"))
+        else:
+             print("API Token scope verified.")
+
+        rn_id = resRN['data']['remoteNetworkCreate']['entity']['id']
+        print("temporary RN ID:"+str(rn_id))
+        # creates a temporary Connector
+        HasError,resCONN = connectors.create_connector("TODELETE",rn_id)
+        if HasError:
+            rn.delete_rn(rn_id)
+            print(errors.token_wrong_scope("READ or READ,WRITE only"))
+            return render_template('error.html',message = errors.rtoken_wrong_scope("READ or READ,WRITE only"))
+        else:
+             print("temporary Connector info:"+str(resCONN))
+        conn_id = resCONN['data']['connectorCreate']['entity']['id']
+        print("temporary Connector ID:"+str(conn_id))
+        HasError,payload = connectors.generate_tokens(conn_id)
+        if HasError:
+            rn.delete_rn(rn_id)
+            print(errors.token_wrong_scope("READ or READ,WRITE only"))
+            return render_template('error.html',message = errors.rtoken_wrong_scope("READ or READ,WRITE only"))
+        else:
+             print("temp Connector tokens generated.")
+        rn.delete_rn(rn_id)
+        print("temp RN removed.")
+        HasError,resp = rn.create_home_rn()
+        if HasError:
+            print(errors.connector_creation(connector_info))
+            return render_template('error.html',message = errors.rconnector_creation(connector_info))
+        else:
+             print("Remote Network created.")
+        rn_id = resp['id']
+        print("Remote Network ID:"+str(rn_id))
+        HasError,connector_info = connectors.create_home_connector(rn_id)
+        if HasError:
+            print(errors.connector_creation(connector_info))
+            return render_template('error.html',message = errors.rconnector_creation(connector_info))
+        else:
+            print("Home Connector created.")
+        connector_id = connector_info['data']['connectorCreate']['entity']['id']
+        HasError,payload = connectors.generate_tokens(connector_id)
+        # Connector tokens are never required client side as they are stored in a staged install script
+        if HasError:
+            # should we delete the home remote network here?
+            print(errors.token_creation(payload))
+            return render_template('error.html',message = errors.rtoken_creation(payload))
+        else:
+             print("Home Connector tokens created.")
+
+        hasError,resp = connectors.install_connector()
+        if hasError:
+            print(errors.rconnector_install_error(resp))
+            return render_template('error.html',message = errors.rconnector_install_error(resp))
+        else:
+             print("Home Connector installed.")
+        subnet = network.get_subnet()
+        print("Subnet retrieved:"+str(subnet))
+        hasError,msg = resources.create_resource_in_homenetwork(rn_id,str(subnet))
+        if hasError:
+            print(errors.tg_res_creation_error(msg))
+            return render_template('error.html',message = errors.rtg_res_creation_error(msg))
+        else:
+            print(errors.success())
+            return render_template('success.html')
+            
+        
+    return render_template('index.html', form=form, message=message)
 
 # stores tenant name and API token locally
 @app.route("/tenant", methods=['POST'])
@@ -102,7 +223,7 @@ def create_connector():
                 return errors.token_creation(payload)
             hasError,resp = connectors.install_connector()
             if hasError:
-                 return errors.intall_connector(resp)
+                 return errors.install_connector(resp)
             
             return errors.success()
     else:

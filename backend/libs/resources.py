@@ -54,12 +54,17 @@ def get_create_resource_payload(token,JsonData):
 
 def create_resource_in_homenetwork(rn_id,address):
     haserror,res = get_home_network_resource()
-    #print(res)
+    if haserror:
+        return True,"error retrieving existing home network resource."
+    
     existing_resources = res['data']['resources']['edges']
     if len(existing_resources) == 0:
         print(res)
         name = "Home Subnet"
         hasError,group_id = groups.get_everyone_groupid()
+        if haserror:
+            return True,"error retrieving everyone group ID."
+        
         return create_resource(rn_id,address,name,group_id)
     else:
         return True,"Resource already exists"
