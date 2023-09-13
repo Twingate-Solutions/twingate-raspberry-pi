@@ -28,6 +28,12 @@ import rn
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d233f2b6176a'
+REMOTE_NETWORK_NAME = "Customer Network"
+CONNECTOR_NAME_STUB = "Twingate Box"
+NETWORK_LOCATION = "ON_PREMISE"
+SUBNET_NAME = "Customer Subnet"
+
+
 bootstrap = Bootstrap5(app)
 csrf = CSRFProtect(app)
 
@@ -97,7 +103,7 @@ def index():
              print("temp Connector tokens generated.")
         rn.delete_rn(rn_id)
         print("temp RN removed.")
-        HasError,resp = rn.create_home_rn()
+        HasError,resp = rn.create_home_rn(REMOTE_NETWORK_NAME,NETWORK_LOCATION)
         if HasError:
             print(errors.connector_creation(connector_info))
             return render_template('error.html',message = errors.rconnector_creation(connector_info))
@@ -105,7 +111,7 @@ def index():
              print("Remote Network created.")
         rn_id = resp['id']
         print("Remote Network ID:"+str(rn_id))
-        HasError,connector_info = connectors.create_home_connector(rn_id)
+        HasError,connector_info = connectors.create_home_connector(CONNECTOR_NAME_STUB,rn_id)
         if HasError:
             print(errors.connector_creation(connector_info))
             return render_template('error.html',message = errors.rconnector_creation(connector_info))
@@ -129,7 +135,7 @@ def index():
              print("Home Connector installed.")
         subnet = network.get_subnet()
         print("Subnet retrieved:"+str(subnet))
-        hasError,msg = resources.create_resource_in_homenetwork(rn_id,str(subnet))
+        hasError,msg = resources.create_resource_in_homenetwork(rn_id,str(subnet),SUBNET_NAME)
         if hasError:
             print(errors.tg_res_creation_error(msg))
             return render_template('error.html',message = errors.rtg_res_creation_error(msg))

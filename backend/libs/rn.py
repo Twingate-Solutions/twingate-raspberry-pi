@@ -3,9 +3,6 @@ import sys
 sys.path.insert(1, './libs')
 import tgapi
 
-NETWORK_NAME = "Home Network"
-NETWORK_LOCATION = "ON_PREMISE"
-
 def get_show_remotenetwork_payload(token,JsonData):
     Headers = tgapi.get_api_call_headers(token)
     api_call_type = "POST"
@@ -157,9 +154,9 @@ def get_home_rn():
                 return {"id":rn_id,"name":rn_name}
         return {}
 
-def create_home_rn():
+def create_home_rn(REMOTE_NETWORK_NAME,NETWORK_LOCATION):
     if not does_home_rn_exist():
-        err,output = create_rn(NETWORK_NAME,NETWORK_LOCATION)
+        err,output = create_rn(REMOTE_NETWORK_NAME,NETWORK_LOCATION)
         if not err:
             return False,output['data']['remoteNetworkCreate']['entity']
         else:

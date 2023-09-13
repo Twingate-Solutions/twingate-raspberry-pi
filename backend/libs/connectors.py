@@ -10,7 +10,6 @@ import tgapi
 import storage
 import errors
 
-CONNECTOR_NAME = "Twingate Box"
 dirname = os.path.dirname(__file__)
 INSTALL_STUB = os.path.join(dirname, '../resources/stub_install_script.sh')
 INSTALL_INSTANCE = os.path.join(dirname, '../resources/install_connector.sh')
@@ -125,9 +124,9 @@ def create_connector(name,id):
     else:
         return False,j
 
-def get_new_connector_name(payload):
+def get_new_connector_name(CONNECTOR_NAME_STUB,payload):
     validConnectorNames = []
-    regstring = CONNECTOR_NAME+" ([\d]+)"
+    regstring = CONNECTOR_NAME_STUB+" ([\d]+)"
     #pattern = re.compile(regstring)
 
     connNumbers = [0]  
@@ -143,7 +142,7 @@ def get_new_connector_name(payload):
             validConnectorNames.append(connName)
 
     newNum = max(connNumbers) + 1
-    newName = CONNECTOR_NAME+" "+str(newNum)
+    newName = CONNECTOR_NAME_STUB+" "+str(newNum)
     return newName
 
 def check_for_running_connector():
@@ -154,22 +153,7 @@ def check_for_running_connector():
     else:
         return False
 
-def check_if_home_connector_exists(payload):
-    ConnAlreadyExists = False
-    ConnIsActive = False
-    connId = ""
-    connectors = payload['data']['remoteNetwork']['connectors']['edges']
-    for connector in connectors:
-        connName = connector['node']['name']
-        connId = connector['node']['id']
-        connState = connector['node']['state']
-        if connName.upper() == CONNECTOR_NAME.upper():
-            ConnAlreadyExists = True
-            if connState == "ALIVE":
-                ConnIsActive = True
-    return ConnAlreadyExists,ConnIsActive,connId
-
-def create_home_connector(id):
+def create_home_connector(CONNECTOR_NAME_STUB,id):
     if check_for_running_connector():
         return True,"Connector already installed on host"
     else:
@@ -177,7 +161,7 @@ def create_home_connector(id):
         if HasError:
             return True,all_connectors
         else:
-            NewConnName = get_new_connector_name(all_connectors)
+            NewConnName = get_new_connector_name(CONNECTOR_NAME_STUB,all_connectors)
             #print(NewConnName)
             return create_connector(NewConnName,id)
 

@@ -11,9 +11,9 @@ import groups
 HOME_SUBNET_RES_NAME = "Home Subnet"
 def get_home_network_resource_payload(token,JsonData):
     Headers = tgapi.get_api_call_headers(token)
-
+    name = JsonData['name']
     api_call_type = "POST"
-    variables = {"fname":HOME_SUBNET_RES_NAME}
+    variables = {"fname":name}
 
     Body = """
     query getResources($fname: String!)
@@ -52,20 +52,20 @@ def get_create_resource_payload(token,JsonData):
     """
     return api_call_type,Headers,Body,variables
 
-def create_resource_in_homenetwork(rn_id,address):
-    haserror,res = get_home_network_resource()
+def create_resource_in_homenetwork(rn_id,address,SUBNET_NAME):
+    haserror,res = get_home_network_resource(SUBNET_NAME)
     if haserror:
         return True,"error retrieving existing home network resource."
     
     existing_resources = res['data']['resources']['edges']
     if len(existing_resources) == 0:
-        print(res)
-        name = "Home Subnet"
+        #print(res)
+        #name = "Home Subnet"
         hasError,group_id = groups.get_everyone_groupid()
         if haserror:
             return True,"error retrieving everyone group ID."
         
-        return create_resource(rn_id,address,name,group_id)
+        return create_resource(rn_id,address,SUBNET_NAME,group_id)
     else:
         return True,"Resource already exists"
     
@@ -78,9 +78,9 @@ def create_resource(rn_id,address,name,group_id):
         return False,j
     
 
-def get_home_network_resource():
+def get_home_network_resource(SUBNET_NAME):
     Cursor = "0"
-    j = tgapi.generic_api_call_handler(get_home_network_resource_payload,{})
+    j = tgapi.generic_api_call_handler(get_home_network_resource_payload,{'name':SUBNET_NAME})
     HadErrors, Msg = tgapi.check_api_error(j)
     #print(j)
     if HadErrors:
