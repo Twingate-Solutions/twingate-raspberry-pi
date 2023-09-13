@@ -1,0 +1,70 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 2. v2.0 | 20110126
+  License: none (public domain)
+*/
+html, body {min-height:100%; padding:0; margin:0;}
+
+#header {
+    background-color:white;
+    height:50px;
+    margin: auto;
+    /*padding:5px;*/
+}
+
+
+.to-align{ 
+  margin-left:500 px;
+}
+
+#comment-box {
+  position: fixed; /* or absolute */
+  top: 45%;
+  left: 45%;
+  color: white;
+  text-align: center;
+  font-size: 250%;
+  width: 300px;
+  height: 100px;
+}
+
+
+.form-horizontal{
+  padding-top:50px;
+}
+
+.info{
+  padding-top: 20px;
+}
+
+.centered-pills {  
+    text-align: center
+}
+.centered-pills ul.nav-pills {
+    display: inline-block
+}
+.centered-pills li {
+    display: inline
+}
+.centered-pills a {
+    float: left
+}
+* html .centered-pills ul.nav-pills, *+html .centered-pills ul.nav-pills {
+    display: inline
+}
+.lic-info{
+  padding-top: 10px;
+}
+.info{
+  padding-top: 60px;
+}
+.validate{
+  text-align: center;
+  padding-top:60px;
+
+}
+.btn-group{
+    padding-top:40px ;
+    margin: 0 auto; 
+    text-align: center;
+    display: inline-block;
+}
+

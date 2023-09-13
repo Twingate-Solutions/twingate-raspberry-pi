@@ -43,8 +43,8 @@ class TGInfoForm(FlaskForm):
 
     adminconsole_url = StringField('Admin Console URL (for example: https:///<yourtenantname>.twingate.com/)', validators=[DataRequired()])
     apitoken = StringField('Twingate API Token with Read, Write & Provision permissions:', validators=[DataRequired(), Length(134, 134)])
-    adminconsole_url = StringField('Admin Console URL (for example: https:///<yourtenantname>.twingate.com/)', validators=[])
-    apitoken = StringField('Twingate API Token with Read, Write & Provision permissions:', validators=[])
+    #adminconsole_url = StringField('Admin Console URL (for example: https:///<yourtenantname>.twingate.com/)', validators=[])
+    #apitoken = StringField('Twingate API Token with Read, Write & Provision permissions:', validators=[])
     submit = SubmitField('Submit')
 
     def validate_adminconsole_url(form, adminconsole_url):
