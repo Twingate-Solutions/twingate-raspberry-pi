@@ -28,14 +28,14 @@ import rn
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d233f2b6176a'
-REMOTE_NETWORK_NAME = "Customer Network"
+REMOTE_NETWORK_NAME = "Home Network"
 CONNECTOR_NAME_STUB = "Twingate Box"
 NETWORK_LOCATION = "ON_PREMISE"
-SUBNET_NAME = "Customer Subnet"
+SUBNET_NAME = "Home Subnet"
 
 
 bootstrap = Bootstrap5(app)
-csrf = CSRFProtect(app)
+#csrf = CSRFProtect(app)
 
 ADMINCONSOLEREGEX = "https:[\/]{2}(.+)\.twingate\.com.*"
 
@@ -199,7 +199,7 @@ def validate_tgapi():
 def create_network():
     error = None
     if request.method == 'POST':
-            HasError,resp = rn.create_home_rn()
+            HasError,resp = rn.create_home_rn(REMOTE_NETWORK_NAME,NETWORK_LOCATION)
             if HasError:
                 return errors.rn_creation(resp)
             return resp
@@ -217,7 +217,7 @@ def create_connector():
                     return errors.rn_id_missing()
                 rn_id = json['id']
             
-            HasError,connector_info = connectors.create_home_connector(rn_id)
+            HasError,connector_info = connectors.create_home_connector(CONNECTOR_NAME_STUB,rn_id)
             if HasError:
                 return errors.connector_creation(connector_info)
             
@@ -257,7 +257,7 @@ def create_subnet_resource():
                 rn_id = json['remoteNetworkId']
 
     if request.method == 'POST':
-            hasError,msg = resources.create_resource_in_homenetwork(rn_id,address)
+            hasError,msg = resources.create_resource_in_homenetwork(rn_id,address,SUBNET_NAME)
             if hasError:
                 return errors.tg_res_creation_error(msg)
             else:

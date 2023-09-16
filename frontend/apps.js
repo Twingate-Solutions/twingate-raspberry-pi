@@ -3,7 +3,9 @@
 // sudo npm -g install hotnode
 
 var server = require('http').createServer(handler);
-var io = require('socket.io')(server);
+//var io = require('socket.io')(server);
+const { Server } = require("socket.io");
+const io = new Server(server);
 var url = require('url');
 var fs = require('fs');
 
@@ -53,7 +55,6 @@ function handler(request,response){
  
 } 
 
-server.listen(8080); //process.env.PORT || 5000);
 
 send404 = function(request, response){
 			response.writeHead(404);
@@ -62,39 +63,103 @@ send404 = function(request, response){
 }
 
 io.on('connection', function (socket) {
-  console.log("connection established:"+socket.id);
-  socket.emit('talk', { id: socket.id });
+
+  //console.log("connection established:"+socket.id);
+  //socket.emit('talk', { id: socket.id });  
 
   socket.on('check_if_connector_is_installed', function(data){
 	var connector_res = tgserv.check_local_connector();
 	if (connector_res['isOK'] === false) {
 		socket.emit('connector_already_present', {});
 	}
-  })
+  });
+  
   socket.on('check_url_and_token', function(data){
-		console.log(data)
-
-		var url_res = tgserv.check_url(data["url"]);
-		console.log(url_res)
-		if (url_res['isOK'] === false) {
-			socket.emit('url_error', {});
-		}
-
-		var token_res = tgserv.check_token(data["token"]);
-		if (token_res['isOK'] === false) {
-			socket.emit('token_error', {});
-		}
-		if (token_res['isOK'] === true && url_res['isOK'] === true ) {
-			socket.emit('url_token_ok', {});
-		}
-
-		//socket.emit('conn_status', { "is_installed": is_installed});
+	console.log("got check url & token event")
+	var url_res = tgserv.check_url(data["url"]);
+	if (url_res['isOK'] === false) {
+		socket.emit('url_error', {});
+	}
+	var thetenant = url_res['tenant']
+	var token_res = tgserv.check_token(data["token"]);
+	if (token_res['isOK'] === false) {
+		socket.emit('token_error', {});
+	}
+	if (token_res['isOK'] === true && url_res['isOK'] === true ) {	
+		socket.emit('url_token_ok', {tenant:thetenant});
+	}
 	});
 
-	socket.on('check_token', function(data){
-		console.log(data)
+	socket.on('store_info', function(data){
+		console.log("got store info event")
+		try{
+			resp = tgserv.store_token_and_tenant(data,socket);
+		}catch(err){
+			console.log("error on storing info: "+err)
+		}
+	});
 
+	socket.on('validate_token_scope2', function(data){
+		console.log("got validate token scope event")
+		try{
+			resp = tgserv.validate_token(socket);
+
+		}catch(err){
+			console.log("error on validate token scope: "+err)
+			//socket.emit('token_scope_error',err)
+		}
+
+	});
+
+	socket.on('create_rn', function(data){
+		console.log("got create RN event")
+		resp = tgserv.create_remote_network(socket);
+	});
+
+	socket.on('create_connector', function(data){
+		console.log("got create connector event")
+		console.log("in create_connector_a")
+		console.log(typeof(data))
+		console.log(data)
+		// data: {"id":"UmVtb3RlTmV0d29yazo2NTI5OA==","name":"Home Network"}
+		console.log("remote network in connector creation:"+data)
+
+		tgserv.create_connector(data,socket);
 		
-		//
+		//resp = 
 	});
+
+	socket.on('get_subnet', function(data){ 
+		console.log("in get_subnet_a")
+		console.log(typeof(data))
+		console.log(data)
+		//try{
+			resp = tgserv.get_subnet(data,socket);
+			//subnet = resp['subnet']
+			//rn_id = data['rnid']
+			//socket.emit('subnet_found',{subnet:subnet,rnid:rn_id})
+
+		//}catch(err){
+		//	socket.emit('subnet_error',err)
+		//}
+
+	});
+
+	socket.on('create_resource', function(data){
+		console.log("in create_resource_a")
+		console.log(typeof(data))
+		console.log(data)
+		//try{
+			resp = tgserv.create_resource(data,socket);
+			socket.emit('resource_created',resp)
+
+		//}catch(err){
+		//	socket.emit('resource_failed',err)
+		//}
+
+	});
+
 });
+
+server.listen(8080); //process.env.PORT || 5000);
+

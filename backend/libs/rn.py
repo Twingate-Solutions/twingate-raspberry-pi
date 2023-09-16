@@ -126,23 +126,23 @@ def simplify_rn_list(rn_raw_list):
                 remote_networks.append({"id":rn['node']['id'],"name":rn['node']['name']})
     return remote_networks
 
-def does_home_rn_exist():
+def does_home_rn_exist(REMOTE_NETWORK_NAME):
     remote_networks = simplify_rn_list(rn_list())
     if len(remote_networks) == 0:
         return False
     else:
         for rn in remote_networks:
             rn_name = rn['name']
-            if rn_name.upper() == NETWORK_NAME.upper():
+            if rn_name.upper() == REMOTE_NETWORK_NAME.upper():
                 return True
         return False
 
-def get_connectors_from_home_rn():
-    home_rn_id = get_home_rn()['id']
+def get_connectors_from_home_rn(REMOTE_NETWORK_NAME):
+    home_rn_id = get_home_rn(REMOTE_NETWORK_NAME)['id']
     j = tgapi.generic_api_call_handler(get_show_remotenetwork_payload,{'id':home_rn_id})
     return j['data']['remoteNetwork']['connectors']['edges']
 
-def get_home_rn():
+def get_home_rn(REMOTE_NETWORK_NAME):
     remote_networks = simplify_rn_list(rn_list())
     if len(remote_networks) == 0:
         return {}
@@ -150,19 +150,19 @@ def get_home_rn():
         for rn in remote_networks:
             rn_name = rn['name']
             rn_id = rn['id']
-            if rn_name.upper() == NETWORK_NAME.upper():
+            if rn_name.upper() == REMOTE_NETWORK_NAME.upper():
                 return {"id":rn_id,"name":rn_name}
         return {}
 
 def create_home_rn(REMOTE_NETWORK_NAME,NETWORK_LOCATION):
-    if not does_home_rn_exist():
+    if not does_home_rn_exist(REMOTE_NETWORK_NAME):
         err,output = create_rn(REMOTE_NETWORK_NAME,NETWORK_LOCATION)
         if not err:
             return False,output['data']['remoteNetworkCreate']['entity']
         else:
             return True,err
     else:
-        return False,get_home_rn()
+        return False,get_home_rn(REMOTE_NETWORK_NAME)
 
 def create_rn(networkname,networklocation):
     j = tgapi.generic_api_call_handler(get_create_remotenetwork_payload,{'name':networkname,'location':networklocation})

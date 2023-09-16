@@ -17,30 +17,95 @@
     var socket = io(); 
     
     function Submit(){
-      
-      socket.emit('check_if_connector_is_installed',{})
+
       var AdminConsoleURL = $('#AdminConsoleURL').val();
       var APIToken = $('#APIToken').val();
+      // TBD: deactivate submit button
       socket.emit('check_url_and_token',{url:AdminConsoleURL,token:APIToken})
     }
     
     socket.on('token_error', function(data){
       console.log("token error");
       console.log(data)
+      // TBD: display error message
     });
 
     socket.on('url_error', function(data){
       console.log("url error");
       console.log(data)
+      // TBD: display error message
     });
 
     socket.on('url_token_ok', function(data){
-      console.log("token & url are OK!");
-      console.log(data)
+      var tenant = data['tenant']
+      var APIToken = $('#APIToken').val();
+      socket.emit('store_info',{tenant:tenant,token:APIToken})
+      // TBD: display OK message
     });
 
+    socket.on('storing_info_ok', function(data){
+      socket.emit('validate_token_scope2',{})
+      // TBD: display OK message
+    })
+
+    socket.on('error_storing_info', function(data){
+      console.log("storing failed!")
+      // TBD: display error message
+    })
+    
     socket.on('connector_already_present', function(data){
       console.log("a connector is already live on the device")
+      // TBD: display error message
+    })
+
+    socket.on('token_scope_is_valid', function(data){
+      console.log("token scope is ok!")
+      socket.emit('create_rn',{})
+    })
+
+    socket.on('token_scope_error', function(data){
+      console.log("token scope check failed!")
+      console.log(data)
+    })
+
+    socket.on('rn_created', function(data){
+      socket.emit('create_connector',data)
+    })
+
+    socket.on('rn_error', function(data){
+      console.log("remote network creation failed!")
+    })
+
+    socket.on('conn_created', function(data){
+      rnid = data['rnid']
+      var dt = {
+        id:rnid
+      }
+      socket.emit('get_subnet',dt) 
+    })
+
+    socket.on('conn_error', function(data){
+      console.log("connector creation failed!")
+      console.log(data)
+    })
+
+    socket.on('subnet_found', function(data){
+      console.log("got data from subnet_found:"+data)
+      socket.emit('create_resource',data)
+    })
+
+    socket.on('subnet_error', function(data){
+      console.log("connector creation failed!")
+      console.log(data)
+    })
+
+    socket.on('resource_created', function(data){
+      console.log("resource created")
+    })
+
+    socket.on('resource_failed', function(data){
+      console.log("resource creation failed!")
+      console.log(data)
     })
 
   </script>
