@@ -5,118 +5,20 @@
   <title>Welcome to Twingate!</title>
   <script src="/socket.io/socket.io.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css"/>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
-
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
 </head>
 <body>
 
-  <script>
-    var socket = io(); 
-    
-    function Submit(){
-
-      var AdminConsoleURL = $('#AdminConsoleURL').val();
-      var APIToken = $('#APIToken').val();
-      // TBD: deactivate submit button
-      socket.emit('check_url_and_token',{url:AdminConsoleURL,token:APIToken})
-    }
-    
-    socket.on('token_error', function(data){
-      console.log("token error");
-      console.log(data)
-      // TBD: display error message
-    });
-
-    socket.on('url_error', function(data){
-      console.log("url error");
-      console.log(data)
-      // TBD: display error message
-    });
-
-    socket.on('url_token_ok', function(data){
-      var tenant = data['tenant']
-      var APIToken = $('#APIToken').val();
-      socket.emit('store_info',{tenant:tenant,token:APIToken})
-      // TBD: display OK message
-    });
-
-    socket.on('storing_info_ok', function(data){
-      socket.emit('validate_token_scope2',{})
-      // TBD: display OK message
-    })
-
-    socket.on('error_storing_info', function(data){
-      console.log("storing failed!")
-      // TBD: display error message
-    })
-    
-    socket.on('connector_already_present', function(data){
-      console.log("a connector is already live on the device")
-      // TBD: display error message
-    })
-
-    socket.on('token_scope_is_valid', function(data){
-      console.log("token scope is ok!")
-      socket.emit('create_rn',{})
-    })
-
-    socket.on('token_scope_error', function(data){
-      console.log("token scope check failed!")
-      console.log(data)
-    })
-
-    socket.on('rn_created', function(data){
-      socket.emit('create_connector',data)
-    })
-
-    socket.on('rn_error', function(data){
-      console.log("remote network creation failed!")
-    })
-
-    socket.on('conn_created', function(data){
-      rnid = data['rnid']
-      var dt = {
-        id:rnid
-      }
-      socket.emit('get_subnet',dt) 
-    })
-
-    socket.on('conn_error', function(data){
-      console.log("connector creation failed!")
-      console.log(data)
-    })
-
-    socket.on('subnet_found', function(data){
-      console.log("got data from subnet_found:"+data)
-      socket.emit('create_resource',data)
-    })
-
-    socket.on('subnet_error', function(data){
-      console.log("connector creation failed!")
-      console.log(data)
-    })
-
-    socket.on('resource_created', function(data){
-      console.log("resource created")
-    })
-
-    socket.on('resource_failed', function(data){
-      console.log("resource creation failed!")
-      console.log(data)
-    })
-
-  </script>
 
   <div id="header">
   </div>
 
     <div class="jumbotron">
         <div class="container">
-          <h1> Welcome to Twingate! </h1>
-          <p> Let's get you started.</p>
+          
+          
         </div>
     </div>
 
@@ -134,7 +36,7 @@
     <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
 
       <h1 class="pt-5 pb-2">Welcome to Twingate!</h1>
-      <h2 class="pt-5 pb-2">Let's get you started with Twingate</h2>
+      <h3 class="pt-5 pb-2">Let's get you started:</h1>
       <ol>
         <li>Sign up for a free Twingate account from our <a href="https://auth.twingate.com/signup">website</a>.</li>
         <li>Create an API Token with <b>Read, Write & Provision permissions</b> from your <b>Twingate Admin Console</b> (under Settings -> API)</li>
@@ -142,18 +44,108 @@
       </ol>
 
       <p class="lead"></p>
-      <form>
-        <div class="form-group">
-          <label for="AdminConsoleURL">Admin Console URL</label>
-          <input type="email" class="form-control" id="AdminConsoleURL" aria-describedby="emailHelp" placeholder="https://dfgdgddfg">
-          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+
+      <form class="row g-3 was-validated">
+        <div class="col-md-12">
+           <label for="AdminConsoleURL" class="form-label">Admin Console URL:</label>
+           <input type="text" class="form-control is-invalid" id="AdminConsoleURL" placeholder="https://<tenant name>.twingate.com/networks" required>
         </div>
-        <div class="form-group">
-          <label for="APIToken">API Token</label>
-          <input type="password" class="form-control" id="APIToken" placeholder="API Token">
+        <div class="col-md-12">
+           <label for="APIToken" class="form-label">Twingate API Token (for Read, Write & Provision):</label>
+           <input type="password" class="form-control is-invalid" id="APIToken" placeholder="YPeAU6I1KvbsC8uDRIUPU94z0WLw..." required>
+           <small id="emailHelp" class="form-text text-muted">Your API Token will only be stored on the Raspberry Pi</small>
         </div>
-        <button class="btn btn-primary btn-lg active" type="button" id="submit" onClick="Submit()" data-toggle="dropdown" aria-expanded="true">Submit</button>
-      </form>
+        <div>
+        <div class="col-12">
+          <button class="btn btn-primary btn-lg active" type="button" id="submit" onClick="Submit()" data-toggle="dropdown" aria-expanded="true">Submit</button>
+        </div>
+      </div>
+
+      <div class="container" id="url_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">URL provided is not properly formatted. Please retry.</small>
+      </div>
+
+      <div class="container" id="url_token_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">URL & Token provided verified.</small>
+      </div>
+
+      <div class="container" id="token_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Format of Twingate API Token is wrong. Please retry.</small>
+      </div>
+
+      <div class="container" id="store_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Storing information on device done.</small>
+      </div>
+
+      <div class="container" id="store_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Storing information on device did not work. Please contact pi@twingate.com.</small>
+      </div>
+
+      <div class="container" id="api_scope_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Token scope verified.</small>
+      </div>
+
+      <div class="container" id="api_scope_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Token scope is wrong. Make sure to provide a token with Read, Write and Provision permissions.</small>
+      </div>
+
+      <div class="container" id="rn_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Remote Network created.</small>
+      </div>
+
+      <div class="container" id="rn_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Error creating Remote Network, please contact pi@twingate.com.</small>
+      </div>
+
+      <div class="container" id="connector_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Connector & tokens created, connector installed.</small>
+      </div>
+
+      <div class="container" id="connector_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Error creating Connector, please contact pi@twingate.com.</small>
+      </div>
+
+      <div class="container" id="subnet_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Subnet detected.</small>
+      </div>
+
+      <div class="container" id="subnet_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Error detecting subnet, please contact pi@twingate.com.</small>
+      </div>
+
+      <div class="container" id="resource_ok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Resource for subnet created.</small>
+      </div>
+
+      <div class="container" id="resource_nok" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">Error creating Resource for subnet, please contact pi@twingate.com.</small>
+      </div>
+     </form>
+    </div>
+  </div>
+</div>
+
+<div class="container" id="success" style="display:none">
+  <div class="row">
+    <div class="col-md-10 col-lg-8 mx-lg-auto mx-md-auto">
+
+      <h1 class="pt-5 pb-2">Success!</h1>
+      <h2 class="pt-5 pb-2">Here is what we have set up for you..</h2>
+      <ol>
+        <li>A Remote Network called <b>"Home Network".</b></li>
+        <li>A <b>Connector</b> running on your Twingate Raspberry Pi</li>
+        <li>A <b>Resource</b> allowing access to your network's primary subdomain</li>
+      </ol>
+
+      <h2 class="pt-5 pb-2">..And here is what you should do next!</h2>
+      <ol>
+        <li>Head over to <a href="https://get.twingate.com">get.twingate.com</a> to download the <b>Twingate Client on your device</b>.</li>
+        <li><b>Sign in to the Twingate Client</b> and test remote connectivity.</li>
+        <li>(If applicable) <b>Close any open port or port forward</b> you have set up on your router prior to deploying Twingate.</li>
+        <li>Follow our <b><a href="https://www.twingate.com/docs/homelab-step-by-step">public guide</a></b> to further protect your home network.</li>
+      </ol>
+      <p class="lead"></p>
+
     </div>
   </div>
 </div>
@@ -162,5 +154,166 @@
   </div>
   </div> 
     
+
+  <script>
+    
+    var socket = io(); 
+    
+    function disableSubmitButton(){
+      $( "#submit").addClass("disabled")
+      $( "#submit").text('loading..');
+    }
+
+    function enableSubmitButton(){
+      $( "#submit").removeClass("disabled")
+      $( "#submit").text('Submit');
+    }
+    function finalizeSubmitButton(){
+      $( "#submit").text('Success!');
+      $( "#submit").addClass("btn-success")
+      $( "#submit").removeClass("btn-primary")
+
+    }
+
+    function Submit(){
+
+      var AdminConsoleURL = $('#AdminConsoleURL').val();
+      var APIToken = $('#APIToken').val();
+      // TBD: deactivate submit button
+      disableSubmitButton()
+      socket.emit('check_url_and_token',{url:AdminConsoleURL,token:APIToken})
+    }
+    
+    socket.on('token_error', function(data){
+      //console.log("token error")
+        enableSubmitButton() //  
+        $( "#APIToken").addClass("is-invalid")
+        $( "#APIToken").removeClass("is-valid")
+        $("#token_nok").show();
+      // TBD: display error message
+    });
+
+    socket.on('url_error', function(data){
+      //console.log("url error");
+      $("#AdminConsoleURL").addClass("is-invalid")
+      $( "#AdminConsoleURL").removeClass("is-valid")
+      enableSubmitButton()
+      $("#url_nok").show();
+      // TBD: display error message
+    });
+
+    socket.on('url_token_ok', function(data){
+      var tenant = data['tenant']
+      var APIToken = $('#APIToken').val();
+      socket.emit('store_info',{tenant:tenant,token:APIToken})
+      $( "#AdminConsoleURL").removeClass("is-invalid")
+      $( "#APIToken").removeClass("is-invalid")
+      $( "#AdminConsoleURL").addClass("is-valid")
+      $( "#APIToken").addClass("is-valid")
+      $("#url_token_ok").show();
+      // TBD: display OK message
+    });
+
+    socket.on('storing_info_ok', function(data){
+      $("#store_ok").show();
+      socket.emit('validate_token_scope2',{})
+      
+      
+      // TBD: display OK message
+    })
+
+    socket.on('error_storing_info', function(data){
+      //console.log("storing failed!")
+      enableSubmitButton()
+      $("#store_nok").show();
+      // TBD: display error message
+    })
+    
+    socket.on('connector_already_present', function(data){
+      //console.log("a connector is already live on the device")
+      enableSubmitButton()
+      // TBD: display error message
+    })
+
+    socket.on('token_scope_is_valid', function(data){
+      //console.log("token scope is ok!")
+      $("#api_scope_ok").show();
+      socket.emit('create_rn',{})
+    })
+
+    socket.on('token_scope_error', function(data){
+      //console.log("token scope check failed!")
+      //console.log(data)
+      $("#api_scope_nok").show();
+      enableSubmitButton()
+    })
+
+    socket.on('rn_created', function(data){
+      $("#rn_ok").show();
+      socket.emit('create_connector',data)
+    })
+
+    socket.on('rn_error', function(data){
+      //console.log("remote network creation failed!")
+      $("#rn_nok").show();
+      enableSubmitButton()
+    })
+
+    socket.on('conn_created', function(data){
+      rnid = data['rnid']
+      var dt = {
+        id:rnid
+      }
+      //console.log("conn created!")
+      //console.log(JSON.stringify(dt))
+      $("#connector_ok").show();
+      socket.emit('get_subnet',dt) 
+    })
+
+    socket.on('conn_error', function(data){
+      //console.log("connector creation failed!")
+      //console.log(data)
+      $("#connector_nok").show();
+      enableSubmitButton()
+    })
+
+    socket.on('subnet_found', function(data){
+      //console.log("got data from subnet_found:")
+      //console.log(data)
+      $("#subnet_ok").show();
+      socket.emit('create_resource',data)
+    })
+
+    socket.on('subnet_error', function(data){
+      //console.log("connector creation failed!")
+      //console.log(data)
+      $("#subnet_nok").show();
+      enableSubmitButton()
+    })
+
+    socket.on('resource_created', function(data){
+      //console.log("resource created")
+      finalizeSubmitButton();
+      //$("#resource_ok").show();
+      $("#resource_ok").hide();
+      $("#subnet_ok").hide();
+      $("#connector_ok").hide();
+      $("#api_scope_ok").hide();
+      $("#url_token_ok").hide();
+      $("#store_ok").hide();
+      $("#rn_ok").hide();
+      $("#success").show();
+    })
+
+    socket.on('resource_failed', function(data){
+      //console.log("resource creation failed!")
+      //console.log(data)
+      $("#resource_nok").show();
+      enableSubmitButton()
+
+    })
+  
+  </script>
+
 </body>
 </html>

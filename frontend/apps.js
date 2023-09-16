@@ -64,9 +64,6 @@ send404 = function(request, response){
 
 io.on('connection', function (socket) {
 
-  //console.log("connection established:"+socket.id);
-  //socket.emit('talk', { id: socket.id });  
-
   socket.on('check_if_connector_is_installed', function(data){
 	var connector_res = tgserv.check_local_connector();
 	if (connector_res['isOK'] === false) {
@@ -77,6 +74,7 @@ io.on('connection', function (socket) {
   socket.on('check_url_and_token', function(data){
 	console.log("got check url & token event")
 	var url_res = tgserv.check_url(data["url"]);
+	
 	if (url_res['isOK'] === false) {
 		socket.emit('url_error', {});
 	}
@@ -133,16 +131,7 @@ io.on('connection', function (socket) {
 		console.log("in get_subnet_a")
 		console.log(typeof(data))
 		console.log(data)
-		//try{
 			resp = tgserv.get_subnet(data,socket);
-			//subnet = resp['subnet']
-			//rn_id = data['rnid']
-			//socket.emit('subnet_found',{subnet:subnet,rnid:rn_id})
-
-		//}catch(err){
-		//	socket.emit('subnet_error',err)
-		//}
-
 	});
 
 	socket.on('create_resource', function(data){
@@ -161,5 +150,5 @@ io.on('connection', function (socket) {
 
 });
 
-server.listen(8080); //process.env.PORT || 5000);
+server.listen(80); //process.env.PORT || 5000);
 

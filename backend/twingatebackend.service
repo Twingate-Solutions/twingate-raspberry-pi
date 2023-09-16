@@ -1,0 +1,13 @@
+[Unit]
+Description=Twingate backend for We Ui
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=flask --app server run -h 0.0.0.0 -p 8080
+Restart=on-failure
+WorkingDirectory=/home/twingate/twingate-raspberry-pi/backend
+
+[Install]
+WantedBy=multi-user.target
