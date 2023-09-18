@@ -97,6 +97,10 @@
         <small id="emailHelp" class="form-text text-muted">Error creating Remote Network, please contact pi@twingate.com.</small>
       </div>
 
+      <div class="container" id="connector_waiting" style="display:none">
+        <small id="emailHelp" class="form-text text-muted">It will take 1 to 2 minutes to create and deploy the Connector.. please bear with us!</small>
+      </div>
+
       <div class="container" id="connector_ok" style="display:none">
         <small id="emailHelp" class="form-text text-muted">Connector & tokens created, connector installed.</small>
       </div>
@@ -250,12 +254,14 @@
 
     socket.on('rn_created', function(data){
       $("#rn_ok").show();
+      $("#connector_waiting").show();
       socket.emit('create_connector',data)
     })
 
     socket.on('rn_error', function(data){
       //console.log("remote network creation failed!")
       $("#rn_nok").show();
+      $("#connector_waiting").hide();
       enableSubmitButton()
     })
 
@@ -266,6 +272,7 @@
       }
       //console.log("conn created!")
       //console.log(JSON.stringify(dt))
+      $("#connector_waiting").hide();
       $("#connector_ok").show();
       socket.emit('get_subnet',dt) 
     })
@@ -299,6 +306,7 @@
       $("#subnet_ok").hide();
       $("#connector_ok").hide();
       $("#api_scope_ok").hide();
+      $("#connector_waiting").hide();
       $("#url_token_ok").hide();
       $("#store_ok").hide();
       $("#rn_ok").hide();
