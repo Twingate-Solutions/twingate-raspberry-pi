@@ -37,10 +37,15 @@
 
       <h1 class="pt-5 pb-2">Welcome to Twingate!</h1>
       <h3 class="pt-5 pb-2">Let's get you started:</h1>
-      <ol>
+      <ol id="default_instructions">
         <li>Sign up for a free Twingate account from our <a href="https://auth.twingate.com/signup">website</a>.</li>
         <li>Create an API Token with <b>Read, Write & Provision permissions</b> from your <b>Twingate Admin Console</b> (under Settings -> API)</li>
         <li>enter your <b>API Token</b> and your Twingate <b>Admin Console URL</b> below and click submit.. We'll take care of the rest!</li>
+      </ol>
+
+      <ol id="redux_instructions" style="display:none">
+        <li>Create an API Token with <b>Read, Write & Provision permissions</b> from your <b><a target="_blank" id="mylink" href="">Twingate Admin Console</a></b> (under Settings -> API)</li>
+        <li>Enter your <b>API Token</b> below and click Submit.. We'll take care of the rest!</li>
       </ol>
 
       <p class="lead"></p>
@@ -48,7 +53,7 @@
       <form class="row g-3 was-validated">
         <div class="col-md-12">
            <label for="AdminConsoleURL" class="form-label">Admin Console URL:</label>
-           <input type="text" class="form-control is-invalid" id="AdminConsoleURL" placeholder="https://<tenant name>.twingate.com/networks" required>
+           <input disabled="disabled" type="text" class="form-control is-invalid" id="AdminConsoleURL" placeholder="https://<tenant name>.twingate.com/networks" required>
         </div>
         <div class="col-md-12">
            <label for="APIToken" class="form-label">Twingate API Token (for Read, Write & Provision):</label>
@@ -162,7 +167,25 @@
   <script>
     
     var socket = io(); 
+
+    socket.on('default_tenant', function(data){
+      if(data['found'] == false){
+        $( "#AdminConsoleURL" ).prop( "disabled", false );
+        $("#redux_instructions").hide();
+        $("#default_instructions").show();
+      }else{
+        tenantname = data['tenant']
+        $("#redux_instructions").show();
+        $("#mylink").attr("href", 'https://'+tenantname+".twingate.com/settings/api");
+        $("#default_instructions").hide();
+        $("#AdminConsoleURL").val('https://'+tenantname+".twingate.com/networks");
+        $("#AdminConsoleURL").removeClass("is-invalid")
+        $("#AdminConsoleURL").addClass("is-valid")
+      }
+    })
     
+    socket.emit('get_default_tenant')
+
     function disableSubmitButton(){
       $( "#submit").addClass("disabled")
       $( "#submit").text('loading..');
@@ -185,9 +208,10 @@
       var APIToken = $('#APIToken').val();
       // TBD: deactivate submit button
       disableSubmitButton()
+      
       socket.emit('check_url_and_token',{url:AdminConsoleURL,token:APIToken})
     }
-    
+
     socket.on('token_error', function(data){
       //console.log("token error")
         enableSubmitButton() //  

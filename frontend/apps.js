@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 var url = require('url');
 var fs = require('fs');
+var tenantconf = require('./tenantconf.json');
 
 // server
 var tgserv = require('./lib/tgserver');
@@ -63,6 +64,23 @@ send404 = function(request, response){
 }
 
 io.on('connection', function (socket) {
+
+  socket.on('get_default_tenant', function(data){
+	var resp = {}
+	if (tenantconf.hasOwnProperty("tenant")) {
+		if (tenantconf['tenant'] == ""){
+			resp = {"found":false,"tenant":""}
+		}else{
+			
+			resp = {"found":true,"tenant":tenantconf['tenant']}
+		}
+	}else{
+		resp = {"found":false,"tenant":""}
+	}
+	
+	socket.emit('default_tenant', resp);
+	});
+
 
   socket.on('check_if_connector_is_installed', function(data){
 	var connector_res = tgserv.check_local_connector();
@@ -151,4 +169,3 @@ io.on('connection', function (socket) {
 });
 
 server.listen(80); //process.env.PORT || 5000);
-

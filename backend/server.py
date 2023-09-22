@@ -62,7 +62,6 @@ def index():
         token = form.apitoken.data
         tenant = re.match(ADMINCONSOLEREGEX, adminurl).group(1)
         print("Form validated:"+tenant)
-
             
         # storing info locally
         if not storage.is_token_valid(token):
