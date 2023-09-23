@@ -28,11 +28,8 @@ import rn
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '7d441f27d441f27567d233f2b6176a'
-REMOTE_NETWORK_NAME = "Home Network"
-CONNECTOR_NAME_STUB = "Twingate Box"
-NETWORK_LOCATION = "ON_PREMISE"
-SUBNET_NAME = "Home Subnet"
 
+REMOTE_NETWORK_NAME,CONNECTOR_NAME_STUB,NETWORK_LOCATION,SUBNET_NAME = storage.GetProfileConfig()
 
 bootstrap = Bootstrap5(app)
 #csrf = CSRFProtect(app)

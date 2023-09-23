@@ -56,7 +56,6 @@ function handler(request,response){
  
 } 
 
-
 send404 = function(request, response){
 			response.writeHead(404);
 			response.write("Error 404. Could not find page "+request.url+"\n");

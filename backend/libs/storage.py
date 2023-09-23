@@ -1,10 +1,13 @@
 import os
 import random
 import uuid
-import logging
+import logging,json
 from os.path import exists
 
 DATAFILEPATH = "./store/"
+CONFIGPROFILES = "./config_profiles.json"
+ACTIVEPROFILE = "./active_profile.json"
+
 TOKENFILE = os.path.join(DATAFILEPATH, ".token_")
 URLFILE = os.path.join(DATAFILEPATH, ".tenant_")
 
@@ -13,6 +16,27 @@ def is_token_valid(atoken):
         return True
     else:
         return False
+
+def GetProfileConfig():
+    REMOTE_NETWORK_NAME=""
+    CONNECTOR_NAME_STUB=""
+    NETWORK_LOCATION=""
+    SUBNET_NAME=""
+
+    with open(CONFIGPROFILES, 'r') as a:
+        profiles = json.load(a)
+    with open(ACTIVEPROFILE, 'r') as b:
+        current_profile = json.load(b)
+    active_profile_name = current_profile['active_profile']
+    for profile in profiles:
+        if profile['name'] == active_profile_name:
+            REMOTE_NETWORK_NAME = profile['config']['REMOTE_NETWORK_NAME']
+            CONNECTOR_NAME_STUB = profile['config']['CONNECTOR_NAME_STUB']
+            NETWORK_LOCATION = profile['config']['NETWORK_LOCATION']
+            SUBNET_NAME = profile['config']['SUBNET_NAME']
+            return REMOTE_NETWORK_NAME,CONNECTOR_NAME_STUB,NETWORK_LOCATION,SUBNET_NAME
+    
+    return REMOTE_NETWORK_NAME,CONNECTOR_NAME_STUB,NETWORK_LOCATION,SUBNET_NAME
 
 def CheckAndCreateDataFolderIfNeeded():
     if not os.path.exists(DATAFILEPATH):

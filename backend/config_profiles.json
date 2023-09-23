@@ -1,0 +1,19 @@
+    [
+        {"name":"DS",
+            "config":{
+                "REMOTE_NETWORK_NAME":"Home Network",
+                "CONNECTOR_NAME_STUB":"Twingate Box",
+                "NETWORK_LOCATION":"ON_PREMISE",
+                "SUBNET_NAME":"Home Subnet"
+            }
+        },
+        {"name":"PR",
+            "config":{
+                "REMOTE_NETWORK_NAME":"Customer Network",
+                "CONNECTOR_NAME_STUB":"Twingate Box",
+                "NETWORK_LOCATION":"ON_PREMISE",
+                "SUBNET_NAME":"Customer Subnet"
+            }
+        }
+    ]
+
